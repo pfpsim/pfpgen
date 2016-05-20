@@ -1,0 +1,208 @@
+/*
+Basic Unit Tests using Producer Consumer model to do functional testing.
+*/
+
+// Checks if an interface and service are named the same does it raise an error
+
+interface WriteI,ReadI;
+service WriteS;
+
+CE LINK implements WriteI,ReadI;
+
+PE Producer{
+  WriteI produce;
+};
+
+PE Consumer{
+  ReadI consume;
+};
+
+/* PE that provides a service named write that is used to write requests to write interface*/
+PE Servicer implements WriteS{
+  WriteI produce;
+};
+
+/* PE that requests a Service from a PE which implements that Service*/
+
+PE ServiceRequester {
+  WriteS ProduceRequest;
+};
+//Variants that have array interfaces
+PE ProducerMany{
+  WriteI produce[];
+};
+
+PE ConsumerMany{
+  ReadI consume[];
+};
+
+
+//<------Will break since binding resolution pass is not implemented for services
+//Does HLIR even have support for array services ?
+PE ServiceRequesterMany {
+  WriteS ProduceRequest[];
+};
+
+
+PE Test1{
+  Producer p1;
+  Consumer c1;
+
+  LINK connectp2c;
+
+  bind p1.produce{connectp2c};
+  bind c1.consume{connectp2c};
+};
+
+PE Test2{
+  Producer p1,p2;
+  Consumer c1,c2;
+
+  LINK connectp2c[2];
+
+  bind p1.produce {connectp2c[0]};
+  bind c1.consume {connectp2c[0]};
+  bind p2.produce {connectp2c[1]};
+  bind c2.consume {connectp2c[1]};
+
+};
+
+PE Test3{
+  Producer p[3];
+  Consumer c[3];
+
+  LINK connectp2c0,connectp2c1,connectp2c2;
+
+  bind p[0].produce {connectp2c0};
+  bind c[0].consume {connectp2c0};
+  bind p[1].produce {connectp2c1};
+  bind c[1].consume {connectp2c1};
+  bind p[2].produce {connectp2c2};
+  bind c[2].consume {connectp2c2};
+};
+
+PE Test4{
+  Producer p[3];
+  Consumer c[3];
+
+  LINK connectp2c[3];
+
+  bind p[0].produce {connectp2c[0]};
+  bind c[0].consume {connectp2c[0]};
+  bind p[1].produce {connectp2c[1]};
+  bind c[1].consume {connectp2c[1]};
+  bind p[2].produce {connectp2c[2]};
+  bind c[2].consume {connectp2c[2]};
+
+};
+
+PE Test5{
+  ProducerMany p;
+  Consumer c[2];
+
+  LINK connectp2c[2];
+
+  bind p.produce {connectp2c[0],connectp2c[1]};
+  bind c[0].consume {connectp2c[0]};
+  bind c[1].consume {connectp2c[1]};
+
+};
+
+PE Test6{
+  ProducerMany p;
+  ConsumerMany c;
+
+  LINK connectp2c[2];
+
+  bind p.produce {connectp2c[0],connectp2c[1]};
+  bind c.consume {connectp2c[0],connectp2c[1]};
+
+};
+
+
+PE Test7{
+  ProducerMany p[2];
+  ConsumerMany c[2];
+
+  LINK connectp2c[4];
+
+  bind p[0].produce {connectp2c[0],connectp2c[1]};
+  bind c[0].consume {connectp2c[0],connectp2c[1]};
+  bind p[1].produce {connectp2c[2],connectp2c[3]};
+  bind c[1].consume {connectp2c[2],connectp2c[3]};
+
+};
+
+PE Test8{
+  ServiceRequester sr;
+  Servicer         s;
+  Consumer         c;
+
+  LINK connectp2c;
+
+  bind sr.ProduceRequest {s};
+  bind s.produce {connectp2c};
+  bind c.consume {connectp2c};
+
+};
+
+PE Test9{
+  ServiceRequester sr[2];
+  Servicer         s;
+  Consumer         c;
+
+  LINK connectp2c;
+
+  bind sr[0].ProduceRequest {s};
+  bind sr[1].ProduceRequest {s};
+  bind s.produce {connectp2c};
+  bind c.consume {connectp2c};
+
+};
+
+
+PE Test10{
+  ServiceRequester sr;
+  Servicer         s[2];
+  Consumer         c[2];
+
+  LINK connectp2c[2];
+
+  bind sr.ProduceRequest {s[0]};
+  bind sr.ProduceRequest {s[1]};
+  bind s[0].produce {connectp2c[0]};
+  bind s[1].produce {connectp2c[1]};
+  bind c[0].consume {connectp2c[0]};
+  bind c[1].consume {connectp2c[1]};
+
+};
+
+PE Test11{
+  ServiceRequester sr[2];
+  Servicer         s[2];
+  Consumer         c[2];
+
+  LINK connectp2c[2];
+
+  bind sr[0].ProduceRequest {s[0]};
+  bind sr[1].ProduceRequest {s[1]};
+  bind s[0].produce {connectp2c[0]};
+  bind s[1].produce {connectp2c[1]};
+  bind c[0].consume {connectp2c[0]};
+  bind c[1].consume {connectp2c[1]};
+
+};
+
+PE top{
+    Test1 test1;
+    Test2 test2;
+    Test3 test3;
+    Test4 test4;
+    Test5 test5;
+    Test6 test6;
+    Test7 test7;
+    Test8 test8;
+    Test9 test9;
+    //Test10 test10;
+    Test11 test11;
+};

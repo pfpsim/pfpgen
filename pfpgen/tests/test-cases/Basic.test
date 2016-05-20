@@ -1,0 +1,48 @@
+empty_file
+An empty file should fail to compile (missing top PE)
+
+%SEM
+
+
+missing_semicolon
+A missing semicolon after the top module is a syntax error
+
+   PE top {
+   
+   }
+
+%SYN
+
+
+minimal_correct
+The minimal correct FAD program that should successfully compile
+
+   PE top {
+   
+   };
+
+%SUC
+
+
+top_is_CE
+Top module is a CE, but must be a PE, this is a semantic error
+
+   interface top_i;
+   CE top implements top_i;
+
+%SEM
+
+top_is_interface
+Top module is an interface, but must be a PE, this is a semantic error
+
+   interface top;
+
+%SEM
+
+top_is_service
+Top module is an interface, but must be a PE, this is a semantic error
+
+service top;
+
+%SEM
+

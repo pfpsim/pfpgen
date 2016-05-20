@@ -1,0 +1,374 @@
+interface QueueRdI, QueueWrI, MemI;
+service  HalS;
+CE Queue implements QueueRdI, QueueWrI;
+CE Memory implements MemI;
+
+PE Router("RouterConfig.cfg") {
+	QueueRdI OCNRdIf[];
+	QueueWrI OCNWrIf[];
+};
+
+PE MEMORYCONTROLLER {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+	MemI MemoryIf;
+};
+
+PE FMG {
+	QueueRdI TECLocalSwitchRdIf;
+	QueueWrI TECLocalSwitchWrIf;
+};
+
+PE MEM("MemoryConfig.cfg") {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+	//QueueRdI TECLocalSwitchRdIf;
+	//QueueWrI TECLocalSwitchWrIf;
+	Memory TLMMemory;	//CE
+	MEMORYCONTROLLER MemoryController;	//PE
+
+	bind MemoryController.MemoryIf {TLMMemory};
+	bind MemoryController.OCNRdIf {OCNRdIf};
+	bind MemoryController.OCNWrIf {OCNWrIf};
+};
+
+PE Splitter {
+	QueueRdI Ingress;
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+};
+
+PE IDA {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+};
+
+PE Parser("ParserConfig.cfg") {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+};
+
+PE Scheduler("SchedularConfig.cfg") {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+};
+
+PE CP {
+	QueueRdI CpRcv;
+	QueueWrI CpSend;
+};
+
+PE CPAgent {
+	QueueRdI OCNRdIf, CpIn;
+	QueueWrI OCNWrIf, CpOut;
+};
+
+PE HAL implements HalS{
+	QueueRdI TECLocalSwitchRdIf;
+	QueueWrI TECLocalSwitchWrIf;
+};
+
+PE ApplicationLayer {
+	HalS	halport;
+};
+
+PE TEU("TEUConfig.cfg") {
+	QueueRdI	TECLocalSwitchRdIf;
+	QueueWrI	TECLocalSwitchWrIf;
+
+	HAL hal;
+	ApplicationLayer applayer;
+	bind applayer.halport {hal};
+	bind hal.TECLocalSwitchRdIf {TECLocalSwitchRdIf};
+	bind hal.TECLocalSwitchWrIf {TECLocalSwitchWrIf};
+};
+
+PE TEC("TECConfig.cfg") {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+	TEU TEU0("TEU.cfg"), TEU1("TEU.cfg"), TEU2("TEU.cfg"), TEU3("TEU.cfg"), TEU4("TEU.cfg"), TEU5("TEU.cfg"), TEU6("TEU.cfg"), TEU7("TEU.cfg");
+	TEU TEU8("TEU.cfg"), TEU9("TEU.cfg"), TEU10("TEU.cfg"), TEU11("TEU.cfg"), TEU12("TEU.cfg"), TEU13("TEU.cfg"), TEU14("TEU.cfg"), TEU15("TEU.cfg");
+	TEU TEU16("TEU.cfg"), TEU17("TEU.cfg"), TEU18("TEU.cfg"), TEU19("TEU.cfg"), TEU20("TEU.cfg"), TEU21("TEU.cfg"), TEU22("TEU.cfg"), TEU23("TEU.cfg");
+	TEU TEU24("TEU.cfg"), TEU25("TEU.cfg"), TEU26("TEU.cfg"), TEU27("TEU.cfg"), TEU28("TEU.cfg"), TEU29("TEU.cfg"), TEU30("TEU.cfg"), TEU31("TEU.cfg");
+	TEU TEU32("TEU.cfg"), TEU33("TEU.cfg"), TEU34("TEU.cfg"), TEU35("TEU.cfg"), TEU36("TEU.cfg"), TEU37("TEU.cfg"), TEU38("TEU.cfg"), TEU39("TEU.cfg");
+	TEU TEU40("TEU.cfg"), TEU41("TEU.cfg"), TEU42("TEU.cfg"), TEU43("TEU.cfg"), TEU44("TEU.cfg"), TEU45("TEU.cfg"), TEU46("TEU.cfg"), TEU47("TEU.cfg");
+
+	FMG fmg;
+
+	MEM edram0MEM("memory.cfg"), edram1MEM("memory.cfg"), edram2MEM("memory.cfg"), edram3MEM("memory.cfg");
+
+	Router TECLocalSwitch;
+
+	Queue TECLocalLinkRdChannel[53];
+
+	//bind TECLocalSwitch.OCNRdIf	{TECLocalLinkRdChannel,OCNRdIf};
+	//bind TECLocalSwitch.OCNRdIf	{TECLocalLinkRdChannel[0:5],OCNRdIf};
+	//bind TECLocalSwitch.OCNRdIf[0:3]	{TECLocalLinkRdChannel[6:8],OCNRdIf};
+	bind TECLocalSwitch.OCNRdIf 		{TECLocalLinkRdChannel[0],TECLocalLinkRdChannel[1],TECLocalLinkRdChannel[2],TECLocalLinkRdChannel[3],	TECLocalLinkRdChannel[4],TECLocalLinkRdChannel[5],TECLocalLinkRdChannel[6],TECLocalLinkRdChannel[7],TECLocalLinkRdChannel[8],TECLocalLinkRdChannel[9],TECLocalLinkRdChannel[10],TECLocalLinkRdChannel[11],TECLocalLinkRdChannel[12],TECLocalLinkRdChannel[13],TECLocalLinkRdChannel[14], TECLocalLinkRdChannel[15], TECLocalLinkRdChannel[16], TECLocalLinkRdChannel[17], TECLocalLinkRdChannel[18], TECLocalLinkRdChannel[19], TECLocalLinkRdChannel[20],TECLocalLinkRdChannel[21],TECLocalLinkRdChannel[22],TECLocalLinkRdChannel[23],	TECLocalLinkRdChannel[24],TECLocalLinkRdChannel[25],TECLocalLinkRdChannel[26],TECLocalLinkRdChannel[27],TECLocalLinkRdChannel[28],TECLocalLinkRdChannel[29],TECLocalLinkRdChannel[30],TECLocalLinkRdChannel[31],TECLocalLinkRdChannel[32],TECLocalLinkRdChannel[33],TECLocalLinkRdChannel[34], TECLocalLinkRdChannel[35], TECLocalLinkRdChannel[36], TECLocalLinkRdChannel[37], TECLocalLinkRdChannel[38], TECLocalLinkRdChannel[39], TECLocalLinkRdChannel[40],TECLocalLinkRdChannel[41],TECLocalLinkRdChannel[42],TECLocalLinkRdChannel[43],	TECLocalLinkRdChannel[44],TECLocalLinkRdChannel[45],TECLocalLinkRdChannel[46],TECLocalLinkRdChannel[47],TECLocalLinkRdChannel[48],TECLocalLinkRdChannel[49],TECLocalLinkRdChannel[50],TECLocalLinkRdChannel[51],TECLocalLinkRdChannel[52], OCNRdIf};
+  // bind TEU[0:49].TECLocalSwitchWrIf {TECLocalLinkRdChannel}
+	bind TEU0.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[0]};
+	bind TEU1.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[1]};
+	bind TEU2.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[2]};
+	bind TEU3.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[3]};
+	bind TEU4.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[4]};
+	bind TEU5.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[5]};
+	bind TEU6.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[6]};
+	bind TEU7.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[7]};
+	bind TEU8.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[8]};
+	bind TEU9.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[9]};
+	bind TEU10.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[10]};
+	bind TEU11.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[11]};
+	bind TEU12.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[12]};
+	bind TEU13.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[13]};
+	bind TEU14.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[14]};
+	bind TEU15.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[15]};
+	bind TEU16.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[16]};
+	bind TEU17.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[17]};
+	bind TEU18.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[18]};
+	bind TEU19.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[19]};
+	bind TEU20.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[20]};
+	bind TEU21.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[21]};
+	bind TEU22.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[22]};
+	bind TEU23.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[23]};
+	bind TEU24.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[24]};
+	bind TEU25.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[25]};
+	bind TEU26.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[26]};
+	bind TEU27.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[27]};
+	bind TEU28.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[28]};
+	bind TEU29.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[29]};
+	bind TEU30.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[30]};
+	bind TEU31.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[31]};
+	bind TEU32.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[32]};
+	bind TEU33.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[33]};
+	bind TEU34.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[34]};
+	bind TEU35.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[35]};
+	bind TEU36.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[36]};
+	bind TEU37.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[37]};
+	bind TEU38.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[38]};
+	bind TEU39.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[39]};
+	bind TEU40.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[40]};
+	bind TEU41.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[41]};
+	bind TEU42.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[42]};
+	bind TEU43.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[43]};
+	bind TEU44.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[44]};
+	bind TEU45.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[45]};
+	bind TEU46.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[46]};
+	bind TEU47.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[47]};
+
+	bind edram0MEM.OCNWrIf		{TECLocalLinkRdChannel[48]};
+	bind edram1MEM.OCNWrIf		{TECLocalLinkRdChannel[49]};
+	bind edram2MEM.OCNWrIf		{TECLocalLinkRdChannel[50]};
+	bind edram3MEM.OCNWrIf		{TECLocalLinkRdChannel[51]};
+
+	bind fmg.TECLocalSwitchWrIf		{TECLocalLinkRdChannel[52]};
+
+	Queue TECLocalLinkWrChannel[53];
+
+	bind TECLocalSwitch.OCNWrIf 		{TECLocalLinkWrChannel[0],TECLocalLinkWrChannel[1],TECLocalLinkWrChannel[2],TECLocalLinkWrChannel[3],TECLocalLinkWrChannel[4],TECLocalLinkWrChannel[5],TECLocalLinkWrChannel[6],TECLocalLinkWrChannel[7],TECLocalLinkWrChannel[8],TECLocalLinkWrChannel[9],TECLocalLinkWrChannel[10],TECLocalLinkWrChannel[11],TECLocalLinkWrChannel[12],TECLocalLinkWrChannel[13],TECLocalLinkWrChannel[14],TECLocalLinkWrChannel[15],TECLocalLinkWrChannel[16],  TECLocalLinkWrChannel[17], TECLocalLinkWrChannel[18], TECLocalLinkWrChannel[19], TECLocalLinkWrChannel[20],TECLocalLinkWrChannel[21],TECLocalLinkWrChannel[22],TECLocalLinkWrChannel[23],	TECLocalLinkWrChannel[24],TECLocalLinkWrChannel[25],TECLocalLinkWrChannel[26],TECLocalLinkWrChannel[27],TECLocalLinkWrChannel[28],TECLocalLinkWrChannel[29],TECLocalLinkWrChannel[30],TECLocalLinkWrChannel[31],TECLocalLinkWrChannel[32],TECLocalLinkWrChannel[33],TECLocalLinkWrChannel[34], TECLocalLinkWrChannel[35], TECLocalLinkWrChannel[36], TECLocalLinkWrChannel[37], TECLocalLinkWrChannel[38], TECLocalLinkWrChannel[39], TECLocalLinkWrChannel[40],TECLocalLinkWrChannel[41],TECLocalLinkWrChannel[42],TECLocalLinkWrChannel[43],	TECLocalLinkWrChannel[44],TECLocalLinkWrChannel[45],TECLocalLinkWrChannel[46],TECLocalLinkWrChannel[47],TECLocalLinkWrChannel[48],TECLocalLinkWrChannel[49],TECLocalLinkWrChannel[50],TECLocalLinkWrChannel[51],TECLocalLinkWrChannel[52], OCNWrIf};
+	bind TEU0.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[0]};
+	bind TEU1.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[1]};
+	bind TEU2.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[2]};
+	bind TEU3.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[3]};
+	bind TEU4.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[4]};
+	bind TEU5.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[5]};
+	bind TEU6.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[6]};
+	bind TEU7.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[7]};
+	bind TEU8.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[8]};
+	bind TEU9.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[9]};
+	bind TEU10.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[10]};
+	bind TEU11.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[11]};
+	bind TEU12.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[12]};
+	bind TEU13.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[13]};
+	bind TEU14.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[14]};
+	bind TEU15.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[15]};
+	bind TEU16.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[16]};
+	bind TEU17.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[17]};
+	bind TEU18.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[18]};
+	bind TEU19.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[19]};
+	bind TEU20.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[20]};
+	bind TEU21.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[21]};
+	bind TEU22.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[22]};
+	bind TEU23.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[23]};
+	bind TEU24.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[24]};
+	bind TEU25.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[25]};
+	bind TEU26.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[26]};
+	bind TEU27.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[27]};
+	bind TEU28.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[28]};
+	bind TEU29.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[29]};
+	bind TEU30.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[30]};
+	bind TEU31.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[31]};
+	bind TEU32.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[32]};
+	bind TEU33.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[33]};
+	bind TEU34.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[34]};
+	bind TEU35.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[35]};
+	bind TEU36.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[36]};
+	bind TEU37.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[37]};
+	bind TEU38.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[38]};
+	bind TEU39.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[39]};
+	bind TEU40.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[40]};
+	bind TEU41.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[41]};
+	bind TEU42.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[42]};
+	bind TEU43.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[43]};
+	bind TEU44.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[44]};
+	bind TEU45.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[45]};
+	bind TEU46.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[46]};
+	bind TEU47.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[47]};
+
+	bind edram0MEM.OCNRdIf		{TECLocalLinkWrChannel[48]};
+	bind edram1MEM.OCNRdIf		{TECLocalLinkWrChannel[49]};
+	bind edram2MEM.OCNRdIf		{TECLocalLinkWrChannel[50]};
+	bind edram3MEM.OCNRdIf		{TECLocalLinkWrChannel[51]};
+
+	bind fmg.TECLocalSwitchRdIf		{TECLocalLinkWrChannel[52]};
+};
+
+PE ODE  {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+};
+
+PE ROC {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+};
+
+PE TrafficManager("TrafficManagerConfig.cfg") {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf;
+	Queue Q0, Q1, Q2, Q3, Q4, Q5, Q6, Q7;
+};
+
+PE Deparser {
+	QueueRdI OCNRdIf;
+	QueueWrI OCNWrIf, Egress;
+};
+
+PE NPU("NPUConfig.cfg") {
+	QueueRdI Ingress, CPInput ;
+	QueueWrI Egress, CPOutput;
+
+	Splitter splitter;
+	IDA ida;
+	Parser parser("Parser.cfg");
+	Scheduler scheduler("Scheduler.cfg");
+	TEC tec0("TEC.cfg");
+	ODE ode;
+	ROC roc;
+	TrafficManager tm("TrafficManager.cfg");
+	Deparser deparser;
+	CPAgent cpagent;
+
+	MEM mct0MEM("memory.cfg");
+
+	Router ocn00, ocn10, ocn20;
+	Router ocn01, ocn11, ocn21;
+	Router ocn02, ocn12, ocn22;
+
+	Queue OCNRdChannel[55];
+	Queue OCNWrChannel[55];
+
+	//ocn00						//splitter			//ida			//ocn01			//ocn10
+	bind ocn00.OCNRdIf			{OCNRdChannel[0], OCNRdChannel[1], OCNRdChannel[2], OCNRdChannel[3]};
+	bind ocn00.OCNWrIf			{OCNWrChannel[0], OCNWrChannel[1], OCNWrChannel[2], OCNWrChannel[3]};
+
+	bind splitter.OCNWrIf		{OCNRdChannel[0]};
+	bind ida.OCNWrIf			{OCNRdChannel[1]};
+
+	bind splitter.OCNRdIf		{OCNWrChannel[0]};
+	bind ida.OCNRdIf			{OCNWrChannel[1]};
+
+
+	//ocn10						//scheduler			//ocn11			//ocn20			//ocn00
+	bind ocn10.OCNRdIf			{OCNRdChannel[4], OCNRdChannel[5], OCNRdChannel[6], OCNWrChannel[3]};
+	bind ocn10.OCNWrIf			{OCNWrChannel[4], OCNWrChannel[5], OCNWrChannel[6], OCNRdChannel[3]};
+
+	bind scheduler.OCNWrIf 	{OCNRdChannel[4]};
+	bind scheduler.OCNRdIf 	{OCNWrChannel[4]};
+
+	//ocn20						//parser			//ocn10			//ocn21
+	bind ocn20.OCNRdIf			{OCNRdChannel[7], OCNWrChannel[6], OCNRdChannel[8]};
+	bind ocn20.OCNWrIf			{OCNWrChannel[7], OCNRdChannel[6], OCNWrChannel[8]};
+
+	bind parser.OCNWrIf		{OCNRdChannel[7]};
+	bind parser.OCNRdIf		{OCNWrChannel[7]};
+
+
+	//ocn01						//tec0				//ocn00			//ocn11				//ocn02
+	bind ocn01.OCNRdIf			{OCNRdChannel[9], OCNWrChannel[2], OCNRdChannel[10], OCNRdChannel[11]};
+	bind ocn01.OCNWrIf			{OCNWrChannel[9], OCNRdChannel[2], OCNWrChannel[10], OCNWrChannel[11]};
+
+	bind tec0.OCNWrIf			{OCNRdChannel[9]};
+	bind tec0.OCNRdIf			{OCNWrChannel[9]};
+
+	//ocn11						//cpagent			//ocn01			//ocn10				//ocn21			 //ocn12
+	bind ocn11.OCNRdIf			{OCNRdChannel[12], OCNWrChannel[10], OCNWrChannel[5], OCNRdChannel[13], OCNRdChannel[14]};
+	bind ocn11.OCNWrIf			{OCNWrChannel[12], OCNRdChannel[10], OCNRdChannel[5], OCNWrChannel[13], OCNWrChannel[14]};
+
+	bind cpagent.OCNWrIf		{OCNRdChannel[12]};
+	bind cpagent.OCNRdIf		{OCNWrChannel[12]};
+
+
+	//ocn21						//tm				//ocn22				//ocn11			//ocn20
+	bind ocn21.OCNRdIf			{OCNRdChannel[15], OCNRdChannel[16], OCNWrChannel[13], OCNWrChannel[8]};
+	bind ocn21.OCNWrIf		{OCNWrChannel[15], OCNWrChannel[16], OCNRdChannel[13], OCNRdChannel[8]};
+
+	bind tm.OCNWrIf			{OCNRdChannel[15]};
+	bind tm.OCNRdIf			{OCNWrChannel[15]};
+
+
+	//ocn02						//mct0MEM				//ocn12			  //ocn01
+	bind ocn02.OCNRdIf			{OCNRdChannel[17], OCNRdChannel[18], OCNWrChannel[11]};
+	bind ocn02.OCNWrIf			{OCNWrChannel[17], OCNWrChannel[18], OCNRdChannel[11]};
+
+	bind mct0MEM.OCNWrIf 			{OCNRdChannel[17]};
+	bind mct0MEM.OCNRdIf 			{OCNWrChannel[17]};
+
+	//ocn12						//roc				//ode			 //ocn22			//ocn02			 //ocn11
+	bind ocn12.OCNRdIf			{OCNRdChannel[19], OCNRdChannel[20], OCNRdChannel[21], OCNWrChannel[18], OCNWrChannel[14]};
+	bind ocn12.OCNWrIf			{OCNWrChannel[19], OCNWrChannel[20], OCNWrChannel[21], OCNRdChannel[18], OCNRdChannel[14]};
+
+	bind roc.OCNWrIf			{OCNRdChannel[19]};
+	bind ode.OCNWrIf			{OCNRdChannel[20]};
+
+	bind roc.OCNRdIf			{OCNWrChannel[19]};
+	bind ode.OCNRdIf			{OCNWrChannel[20]};
+
+	//ocn22						//deparser			//ocn12				//ocn21
+	bind ocn22.OCNRdIf			{OCNRdChannel[22], OCNWrChannel[21], OCNWrChannel[16]};
+	bind ocn22.OCNWrIf			{OCNWrChannel[22], OCNRdChannel[21], OCNRdChannel[16]};
+
+	bind deparser.OCNWrIf		{OCNRdChannel[22]};
+	bind deparser.OCNRdIf		{OCNWrChannel[22]};
+
+
+	bind splitter.Ingress {Ingress};
+	bind deparser.Egress {Egress};
+	bind cpagent.CpIn {CPInput};
+	bind cpagent.CpOut {CPOutput};
+
+};
+
+PE PKTGEN {
+	QueueWrI out;
+};
+
+PE LOGGER {
+	QueueRdI in;
+};
+
+PE top {
+	Queue IKI, IKE, CPInput, CPOutput;
+	PKTGEN pktgen;
+	LOGGER logger;
+	NPU npu("NPU.cfg");
+	CP ControlPlane;
+
+	bind pktgen.out {IKI};
+	bind npu.Ingress {IKI};
+	bind npu.Egress {IKE};
+	bind npu.CPInput {CPOutput};
+	bind npu.CPOutput {CPInput};
+	bind logger.in {IKE};
+	bind ControlPlane.CpSend {CPOutput};
+	bind ControlPlane.CpRcv {CPInput};
+};

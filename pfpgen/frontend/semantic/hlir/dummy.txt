@@ -1,0 +1,57 @@
+class TypeSpecifier:
+    def __init__(self, name, is_array=False, array_size=None):
+        self.name       = name
+        self.is_array   = is_array
+        self.array_size = array_size
+
+class Instance:
+    def __init__(self, type, name, config_path=None):
+        self.type        = type
+        self.name        = name
+        self.config_path = config_path
+
+class CEinstance(Instance):
+    def __init__(self, type, name):
+        super(type, name)
+
+class PEinstance(Instance):
+    def __init__(self, type, name):
+        super(type, name)
+
+class Service:
+    def __init__(self, name):
+        self.name = name
+
+class Interface:
+    def __init__(self, name):
+        self.name = name
+
+class Bind:
+    def __init__(self,src,dest):
+        self.src = src
+        self.dest = dest
+
+class Bindobject:
+    def __init__(self,name,reference,):
+        self.name = name
+
+class PE:
+    def __init__(self):
+        self.services   = [ Service("FooService") ]
+        self.pe_members = [ PEinstance(TypeSpecifier("Foobar"), "foobar") ]
+        self.ce_members = [ CEinstance(TypeSpecifier("Blabla"), "blabla") ]
+        self.metadata   = { "numThreads" : 1 }
+        self.bind       = [ Bind(Bindsrc("src"),[Binddest("a"),Binddest("b")] ]
+
+class CE:
+    def __init__(self):
+        self.interfaces = [ Interface("FooInterface") ]
+
+class FadProgram:
+    def __init__(self):
+        self.interfaces = [ Interface("FooInterface") ]
+        self.services   = [ Service("FooService") ]
+        self.CEs = [CE(), CE()]
+        self.PEs = [PE(), PE(), PE()]
+        self.top_level_PE = self.PEs[0]
+        self.metadata = { "configRoot" : "./" }

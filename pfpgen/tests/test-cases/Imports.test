@@ -1,0 +1,140 @@
+empty_user_import_statement
+This is a basic import statement, file exists in the user dir.
+
+import usercode;
+PE top {};
+
+%SUC
+
+empty_system_import_statement
+This is a basic import statement, file exists in the sys dir.
+
+import syscode;
+PE top {};
+
+%SUC
+
+nested_empty_user_import
+This is a basic import statement, file exists in the user dir.
+
+import usermodule.submodule;
+PE top {};
+
+%SUC
+
+nested_empty_system_import
+This is a basic import statement, file exists in the sys dir.
+
+import sysmodule.submodule;
+PE top {};
+
+%SUC
+
+redundant_import_user_module
+Redundantly double-imports and uses a PE defined in a user module
+
+import UserFoo;
+import UserFoo;
+
+PE top {
+   Foo foo;
+};
+
+%SUC
+
+import_user_module_from_alternate_path
+Imports and uses a PE defined in a user module from user2 directory
+
+import User2Foo;
+
+PE top {
+   Foo foo;
+};
+
+%SUC
+
+import_user_module
+Imports and uses a PE defined in a user module
+
+import UserFoo;
+
+PE top {
+   Foo foo;
+};
+
+%SUC
+
+redundant_import_sys_module
+Redundantly double-imports and uses a PE defined in a system module
+
+import SysBar;
+import SysBar;
+
+PE top {
+   Bar bar;
+};
+
+%SUC
+
+import_sys_module_from_alternate_path
+Imports and uses a PE defined in a system module in the sys2 directory
+
+import Sys2Bar;
+
+PE top {
+   Bar bar;
+};
+
+%SUC
+
+
+import_sys_module
+Imports and uses a PE defined in a system module
+
+import SysBar;
+
+PE top {
+   Bar bar;
+};
+
+%SUC
+
+
+malformed_import
+This should fail
+
+import test,module,foo;
+
+PE top {};
+
+%SYN
+
+duplicate_definition_in_main_file
+Imports a PE then redefines it in the main FAD file. Should fail.
+
+import UserFoo;
+
+PE Foo {
+
+};
+
+PE top {
+  Foo foo;
+};
+
+%SEM
+
+duplicate_definition_in_imported_file
+Imports a FAD file that redefines an existing PE. Should Fail.
+
+PE Foo {
+
+};
+
+import UserFoo;
+
+PE top {
+  Foo foo;
+};
+
+%SEM

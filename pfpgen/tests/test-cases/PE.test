@@ -1,0 +1,111 @@
+PE_declaration
+A correct PE declarations
+
+   PE foo {
+
+   };
+
+   PE top {
+
+   };
+
+%SUC
+
+PE_w_interface
+A PE declaration with an implemented interface. Should fail
+
+   interface fooS;
+   PE foo implements fooS {
+
+   };
+   PE top {
+
+   };
+
+%SEM
+
+PE_w_service
+A correct PE declaration with an implemented service
+
+   service fooS;
+   PE foo implements fooS {
+
+   };
+   PE top {
+
+   };
+
+%SUC
+
+PE_w_type_config
+PE with type config
+
+   PE foo("foo.cfg") {
+
+   };
+   PE top {};
+%SUC
+
+PE_w_type_conf_and_service
+PE with type config and implemented service
+
+   service fooS;
+   PE foo("foo.cfg") implements fooS {
+   };
+   PE top {
+
+   };
+
+%SUC
+
+
+PE_instance_conf_wout_type_conf
+PE instance config without type config
+
+    PE dummy /* No config here */ {};
+    PE foo {
+        // Instance Config not allowed if the type
+        // does not have a type config
+        dummy myDummy("dummy.cfg");
+    };
+    PE top {} ;
+
+%SEM
+
+PE_with_array_member
+The top PE with an array member
+
+   PE foobar {};
+   PE top {
+      foobar foo[12];
+   };
+%SUC
+
+
+PE_with_array_member_w_inst_conf_wout_type_conf
+Incorrect syntax for an array member with instance config in a PE.
+
+   PE foobar {};
+   PE top {
+      foobar foo[12]("foo.cfg");
+   };
+%SYN
+
+PE_with_array_member_w_inst_conf
+Array member with instance config but no type config. This should not compile.
+
+   PE foobar {};
+   PE top {
+      foobar foo("foo.cfg")[12];
+   };
+%SEM
+
+
+PE_with_array_member_w_bad_inst_conf
+Correctly declared array member with instance configuration
+
+   PE foobar("main_foo.cfg") {};
+   PE top {
+      foobar foo("foo.cfg")[12];
+   };
+%SUC

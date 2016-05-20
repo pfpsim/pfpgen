@@ -1,0 +1,393 @@
+interface QueueRdI, QueueWrI, MemI;
+service  HalS, ControlPlaneAgentS, ControlPlaneAgentHalS;
+CE Queue("QueueConfig.cfg") implements QueueRdI, QueueWrI;
+CE Memory implements MemI;
+
+PE Router("RouterConfig.cfg") {
+	QueueRdI ocn_rd_if[];
+	QueueWrI ocn_wr_if[];
+};
+
+PE MemoryController {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+	MemI memory_if;
+};
+
+PE MemoryManager {
+	QueueRdI cluster_local_switch_rd_if;
+	QueueWrI cluster_local_switch_wr_if;
+};
+
+PE Mem("MemoryConfig.cfg") {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+	Memory tlm_memory;	//CE
+	MemoryController memory_controller;	//PE
+
+	bind memory_controller.memory_if {tlm_memory};
+	bind memory_controller.ocn_rd_if {ocn_rd_if};
+	bind memory_controller.ocn_wr_if {ocn_wr_if};
+};
+
+PE Splitter {
+	QueueRdI ingress;
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+};
+
+PE IDA {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+};
+
+PE Parser("ParserConfig.cfg") {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+};
+
+PE Scheduler("SchedularConfig.cfg") {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+};
+
+PE ControlPlane {
+  ControlPlaneAgentS cpa;
+};
+
+PE ControlPlaneAgentHAL implements ControlPlaneAgentHalS{
+    QueueRdI ocn_rd_if;
+    QueueWrI ocn_wr_if;
+};
+
+PE ControlPlaneAgent implements ControlPlaneAgentS {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+    ControlPlaneAgentHAL cpagenthal;
+    bind cpagenthal.ocn_rd_if{ocn_rd_if};
+    bind cpagenthal.ocn_wr_if{ocn_wr_if};
+};
+
+PE HAL implements HalS{
+	QueueRdI cluster_local_switch_rd_if;
+	QueueWrI cluster_local_switch_wr_if;
+};
+
+PE ApplicationLayer {
+	HalS	halport;
+};
+
+PE Core("CoreConfig.cfg") {
+	QueueRdI	cluster_local_switch_rd_if;
+	QueueWrI	cluster_local_switch_wr_if;
+
+	HAL hal;
+	ApplicationLayer applayer;
+	bind applayer.halport {hal};
+	bind hal.cluster_local_switch_rd_if {cluster_local_switch_rd_if};
+	bind hal.cluster_local_switch_wr_if {cluster_local_switch_wr_if};
+};
+
+PE Cluster("ClusterConfig.cfg") {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+	Core core_0("Core.cfg"), core_1("Core.cfg"), core_2("Core.cfg"), core_3("Core.cfg"), core_4("Core.cfg"), core_5("Core.cfg"), core_6("Core.cfg"), core_7("Core.cfg");
+	Core core_8("Core.cfg"), core_9("Core.cfg"), core_10("Core.cfg"), core_11("Core.cfg"), core_12("Core.cfg"), core_13("Core.cfg"), core_14("Core.cfg"), core_15("Core.cfg");
+	Core core_16("Core.cfg"), core_17("Core.cfg"), core_18("Core.cfg"), core_19("Core.cfg"), core_20("Core.cfg"), core_21("Core.cfg"), core_22("Core.cfg"), core_23("Core.cfg");
+	Core core_24("Core.cfg"), core_25("Core.cfg"), core_26("Core.cfg"), core_27("Core.cfg"), core_28("Core.cfg"), core_29("Core.cfg"), core_30("Core.cfg"), core_31("Core.cfg");
+	Core core_32("Core.cfg"), core_33("Core.cfg"), core_34("Core.cfg"), core_35("Core.cfg"), core_36("Core.cfg"), core_37("Core.cfg"), core_38("Core.cfg"), core_39("Core.cfg");
+	Core core_40("Core.cfg"), core_41("Core.cfg"), core_42("Core.cfg"), core_43("Core.cfg"), core_44("Core.cfg"), core_45("Core.cfg"), core_46("Core.cfg"), core_47("Core.cfg");
+
+	MemoryManager memory_manager;
+
+	Mem edram_0_mem("memory.cfg"), edram_1_mem("memory.cfg"), edram_2_mem("memory.cfg"), edram_3_mem("memory.cfg");
+
+	Router cluster_local_switch;
+
+	Queue cluster_local_link_rd_channel[53];
+
+	//bind cluster_local_switch.ocn_rd_if	{cluster_local_link_rd_channel,ocn_rd_if};
+	//bind cluster_local_switch.ocn_rd_if	{cluster_local_link_rd_channel[0:5],ocn_rd_if};
+	//bind cluster_local_switch.ocn_rd_if[0:3]	{cluster_local_link_rd_channel[6:8],ocn_rd_if};
+	bind cluster_local_switch.ocn_rd_if 		{cluster_local_link_rd_channel[0],cluster_local_link_rd_channel[1],cluster_local_link_rd_channel[2],cluster_local_link_rd_channel[3],	cluster_local_link_rd_channel[4],cluster_local_link_rd_channel[5],cluster_local_link_rd_channel[6],cluster_local_link_rd_channel[7],cluster_local_link_rd_channel[8],cluster_local_link_rd_channel[9],cluster_local_link_rd_channel[10],cluster_local_link_rd_channel[11],cluster_local_link_rd_channel[12],cluster_local_link_rd_channel[13],cluster_local_link_rd_channel[14], cluster_local_link_rd_channel[15], cluster_local_link_rd_channel[16], cluster_local_link_rd_channel[17], cluster_local_link_rd_channel[18], cluster_local_link_rd_channel[19], cluster_local_link_rd_channel[20],cluster_local_link_rd_channel[21],cluster_local_link_rd_channel[22],cluster_local_link_rd_channel[23],	cluster_local_link_rd_channel[24],cluster_local_link_rd_channel[25],cluster_local_link_rd_channel[26],cluster_local_link_rd_channel[27],cluster_local_link_rd_channel[28],cluster_local_link_rd_channel[29],cluster_local_link_rd_channel[30],cluster_local_link_rd_channel[31],cluster_local_link_rd_channel[32],cluster_local_link_rd_channel[33],cluster_local_link_rd_channel[34], cluster_local_link_rd_channel[35], cluster_local_link_rd_channel[36], cluster_local_link_rd_channel[37], cluster_local_link_rd_channel[38], cluster_local_link_rd_channel[39], cluster_local_link_rd_channel[40],cluster_local_link_rd_channel[41],cluster_local_link_rd_channel[42],cluster_local_link_rd_channel[43],	cluster_local_link_rd_channel[44],cluster_local_link_rd_channel[45],cluster_local_link_rd_channel[46],cluster_local_link_rd_channel[47],cluster_local_link_rd_channel[48],cluster_local_link_rd_channel[49],cluster_local_link_rd_channel[50],cluster_local_link_rd_channel[51],cluster_local_link_rd_channel[52], ocn_rd_if};
+  // bind Core[0:49].cluster_local_switch_wr_if {cluster_local_link_rd_channel}
+	bind core_0.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[0]};
+	bind core_1.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[1]};
+	bind core_2.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[2]};
+	bind core_3.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[3]};
+	bind core_4.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[4]};
+	bind core_5.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[5]};
+	bind core_6.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[6]};
+	bind core_7.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[7]};
+	bind core_8.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[8]};
+	bind core_9.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[9]};
+	bind core_10.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[10]};
+	bind core_11.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[11]};
+	bind core_12.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[12]};
+	bind core_13.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[13]};
+	bind core_14.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[14]};
+	bind core_15.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[15]};
+	bind core_16.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[16]};
+	bind core_17.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[17]};
+	bind core_18.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[18]};
+	bind core_19.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[19]};
+	bind core_20.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[20]};
+	bind core_21.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[21]};
+	bind core_22.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[22]};
+	bind core_23.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[23]};
+	bind core_24.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[24]};
+	bind core_25.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[25]};
+	bind core_26.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[26]};
+	bind core_27.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[27]};
+	bind core_28.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[28]};
+	bind core_29.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[29]};
+	bind core_30.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[30]};
+	bind core_31.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[31]};
+	bind core_32.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[32]};
+	bind core_33.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[33]};
+	bind core_34.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[34]};
+	bind core_35.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[35]};
+	bind core_36.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[36]};
+	bind core_37.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[37]};
+	bind core_38.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[38]};
+	bind core_39.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[39]};
+	bind core_40.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[40]};
+	bind core_41.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[41]};
+	bind core_42.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[42]};
+	bind core_43.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[43]};
+	bind core_44.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[44]};
+	bind core_45.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[45]};
+	bind core_46.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[46]};
+	bind core_47.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[47]};
+
+	bind edram_0_mem.ocn_wr_if		{cluster_local_link_rd_channel[48]};
+	bind edram_1_mem.ocn_wr_if		{cluster_local_link_rd_channel[49]};
+	bind edram_2_mem.ocn_wr_if		{cluster_local_link_rd_channel[50]};
+	bind edram_3_mem.ocn_wr_if		{cluster_local_link_rd_channel[51]};
+
+	bind memory_manager.cluster_local_switch_wr_if		{cluster_local_link_rd_channel[52]};
+
+	Queue cluster_local_link_wr_channel[53];
+
+	bind cluster_local_switch.ocn_wr_if 		{cluster_local_link_wr_channel[0],cluster_local_link_wr_channel[1],cluster_local_link_wr_channel[2],cluster_local_link_wr_channel[3],cluster_local_link_wr_channel[4],cluster_local_link_wr_channel[5],cluster_local_link_wr_channel[6],cluster_local_link_wr_channel[7],cluster_local_link_wr_channel[8],cluster_local_link_wr_channel[9],cluster_local_link_wr_channel[10],cluster_local_link_wr_channel[11],cluster_local_link_wr_channel[12],cluster_local_link_wr_channel[13],cluster_local_link_wr_channel[14],cluster_local_link_wr_channel[15],cluster_local_link_wr_channel[16],  cluster_local_link_wr_channel[17], cluster_local_link_wr_channel[18], cluster_local_link_wr_channel[19], cluster_local_link_wr_channel[20],cluster_local_link_wr_channel[21],cluster_local_link_wr_channel[22],cluster_local_link_wr_channel[23],	cluster_local_link_wr_channel[24],cluster_local_link_wr_channel[25],cluster_local_link_wr_channel[26],cluster_local_link_wr_channel[27],cluster_local_link_wr_channel[28],cluster_local_link_wr_channel[29],cluster_local_link_wr_channel[30],cluster_local_link_wr_channel[31],cluster_local_link_wr_channel[32],cluster_local_link_wr_channel[33],cluster_local_link_wr_channel[34], cluster_local_link_wr_channel[35], cluster_local_link_wr_channel[36], cluster_local_link_wr_channel[37], cluster_local_link_wr_channel[38], cluster_local_link_wr_channel[39], cluster_local_link_wr_channel[40],cluster_local_link_wr_channel[41],cluster_local_link_wr_channel[42],cluster_local_link_wr_channel[43],	cluster_local_link_wr_channel[44],cluster_local_link_wr_channel[45],cluster_local_link_wr_channel[46],cluster_local_link_wr_channel[47],cluster_local_link_wr_channel[48],cluster_local_link_wr_channel[49],cluster_local_link_wr_channel[50],cluster_local_link_wr_channel[51],cluster_local_link_wr_channel[52], ocn_wr_if};
+	bind core_0.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[0]};
+	bind core_1.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[1]};
+	bind core_2.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[2]};
+	bind core_3.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[3]};
+	bind core_4.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[4]};
+	bind core_5.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[5]};
+	bind core_6.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[6]};
+	bind core_7.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[7]};
+	bind core_8.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[8]};
+	bind core_9.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[9]};
+	bind core_10.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[10]};
+	bind core_11.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[11]};
+	bind core_12.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[12]};
+	bind core_13.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[13]};
+	bind core_14.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[14]};
+	bind core_15.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[15]};
+	bind core_16.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[16]};
+	bind core_17.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[17]};
+	bind core_18.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[18]};
+	bind core_19.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[19]};
+	bind core_20.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[20]};
+	bind core_21.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[21]};
+	bind core_22.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[22]};
+	bind core_23.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[23]};
+	bind core_24.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[24]};
+	bind core_25.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[25]};
+	bind core_26.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[26]};
+	bind core_27.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[27]};
+	bind core_28.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[28]};
+	bind core_29.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[29]};
+	bind core_30.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[30]};
+	bind core_31.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[31]};
+	bind core_32.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[32]};
+	bind core_33.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[33]};
+	bind core_34.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[34]};
+	bind core_35.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[35]};
+	bind core_36.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[36]};
+	bind core_37.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[37]};
+	bind core_38.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[38]};
+	bind core_39.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[39]};
+	bind core_40.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[40]};
+	bind core_41.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[41]};
+	bind core_42.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[42]};
+	bind core_43.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[43]};
+	bind core_44.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[44]};
+	bind core_45.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[45]};
+	bind core_46.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[46]};
+	bind core_47.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[47]};
+
+	bind edram_0_mem.ocn_rd_if		{cluster_local_link_wr_channel[48]};
+	bind edram_1_mem.ocn_rd_if		{cluster_local_link_wr_channel[49]};
+	bind edram_2_mem.ocn_rd_if		{cluster_local_link_wr_channel[50]};
+	bind edram_3_mem.ocn_rd_if		{cluster_local_link_wr_channel[51]};
+
+	bind memory_manager.cluster_local_switch_rd_if		{cluster_local_link_wr_channel[52]};
+
+};
+
+PE ODE  {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+};
+
+PE ReorderController {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+};
+
+PE TrafficManager("TrafficManagerConfig.cfg") {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if;
+	Queue queue_0, queue_1, queue_2, queue_3, queue_4, queue_5, queue_6, queue_7;
+};
+
+PE Deparser {
+	QueueRdI ocn_rd_if;
+	QueueWrI ocn_wr_if, egress;
+};
+
+PE NPU("NPUConfig.cfg") implements ControlPlaneAgentS {
+	QueueRdI ingress;
+	QueueWrI egress;
+
+	Splitter splitter;
+	IDA ida;
+	Parser parser("Parser.cfg");
+	Scheduler scheduler("Scheduler.cfg");
+	Cluster cluster_0("Cluster.cfg");
+	ODE ode;
+	ReorderController roc;
+	TrafficManager tm("TrafficManager.cfg");
+	Deparser deparser;
+	ControlPlaneAgent cpagent;
+
+	Mem mct_0_mem("memory.cfg");
+
+	Router ocn_00, ocn_10, ocn_20;
+	Router ocn_01, ocn_11, ocn_21;
+	Router ocn_02, ocn_12, ocn_22;
+
+	Queue ocn_rd_channel[55];
+	Queue ocn_wr_channel[55];
+
+	//ocn_00						//splitter			//ida			//ocn_01			//ocn_10
+	bind ocn_00.ocn_rd_if			{ocn_rd_channel[0], ocn_rd_channel[1], ocn_rd_channel[2], ocn_rd_channel[3]};
+	bind ocn_00.ocn_wr_if			{ocn_wr_channel[0], ocn_wr_channel[1], ocn_wr_channel[2], ocn_wr_channel[3]};
+
+	bind splitter.ocn_wr_if		{ocn_rd_channel[0]};
+	bind ida.ocn_wr_if			{ocn_rd_channel[1]};
+
+	bind splitter.ocn_rd_if		{ocn_wr_channel[0]};
+	bind ida.ocn_rd_if			{ocn_wr_channel[1]};
+
+
+	//ocn_10						//scheduler			//ocn_11			//ocn_20			//ocn_00
+	bind ocn_10.ocn_rd_if			{ocn_rd_channel[4], ocn_rd_channel[5], ocn_rd_channel[6], ocn_wr_channel[3]};
+	bind ocn_10.ocn_wr_if			{ocn_wr_channel[4], ocn_wr_channel[5], ocn_wr_channel[6], ocn_rd_channel[3]};
+
+	bind scheduler.ocn_wr_if 	{ocn_rd_channel[4]};
+	bind scheduler.ocn_rd_if 	{ocn_wr_channel[4]};
+
+	//ocn_20						//parser			//ocn_10			//ocn_21
+	bind ocn_20.ocn_rd_if			{ocn_rd_channel[7], ocn_wr_channel[6], ocn_rd_channel[8]};
+	bind ocn_20.ocn_wr_if			{ocn_wr_channel[7], ocn_rd_channel[6], ocn_wr_channel[8]};
+
+	bind parser.ocn_wr_if		{ocn_rd_channel[7]};
+	bind parser.ocn_rd_if		{ocn_wr_channel[7]};
+
+
+	//ocn_01						//cluster_0				//ocn_00			//ocn_11				//ocn_02
+	bind ocn_01.ocn_rd_if			{ocn_rd_channel[9], ocn_wr_channel[2], ocn_rd_channel[10], ocn_rd_channel[11]};
+	bind ocn_01.ocn_wr_if			{ocn_wr_channel[9], ocn_rd_channel[2], ocn_wr_channel[10], ocn_wr_channel[11]};
+
+	bind cluster_0.ocn_wr_if			{ocn_rd_channel[9]};
+	bind cluster_0.ocn_rd_if			{ocn_wr_channel[9]};
+
+	//ocn_11						//cpagent			//ocn_01			//ocn_10				//ocn_21			 //ocn_12
+	bind ocn_11.ocn_rd_if			{ocn_rd_channel[12], ocn_wr_channel[10], ocn_wr_channel[5], ocn_rd_channel[13], ocn_rd_channel[14]};
+	bind ocn_11.ocn_wr_if			{ocn_wr_channel[12], ocn_rd_channel[10], ocn_rd_channel[5], ocn_wr_channel[13], ocn_wr_channel[14]};
+
+	bind cpagent.ocn_wr_if		{ocn_rd_channel[12]};
+	bind cpagent.ocn_rd_if		{ocn_wr_channel[12]};
+
+
+	//ocn_21						//tm				//ocn_22				//ocn_11			//ocn_20
+	bind ocn_21.ocn_rd_if			{ocn_rd_channel[15], ocn_rd_channel[16], ocn_wr_channel[13], ocn_wr_channel[8]};
+	bind ocn_21.ocn_wr_if		{ocn_wr_channel[15], ocn_wr_channel[16], ocn_rd_channel[13], ocn_rd_channel[8]};
+
+	bind tm.ocn_wr_if			{ocn_rd_channel[15]};
+	bind tm.ocn_rd_if			{ocn_wr_channel[15]};
+
+	//ocn_02						//mct_0_mem				//ocn_12			  //ocn_01
+	bind ocn_02.ocn_rd_if			{ocn_rd_channel[17], ocn_rd_channel[18], ocn_wr_channel[11]};
+	bind ocn_02.ocn_wr_if			{ocn_wr_channel[17], ocn_wr_channel[18], ocn_rd_channel[11]};
+
+	bind mct_0_mem.ocn_wr_if 			{ocn_rd_channel[17]};
+	bind mct_0_mem.ocn_rd_if 			{ocn_wr_channel[17]};
+
+	//ocn_12						//roc				//ode			 //ocn_22			//ocn_02			 //ocn_11
+	bind ocn_12.ocn_rd_if			{ocn_rd_channel[19], ocn_rd_channel[20], ocn_rd_channel[21], ocn_wr_channel[18], ocn_wr_channel[14]};
+	bind ocn_12.ocn_wr_if			{ocn_wr_channel[19], ocn_wr_channel[20], ocn_wr_channel[21], ocn_rd_channel[18], ocn_rd_channel[14]};
+
+	bind roc.ocn_wr_if			{ocn_rd_channel[19]};
+	bind ode.ocn_wr_if			{ocn_rd_channel[20]};
+
+	bind roc.ocn_rd_if			{ocn_wr_channel[19]};
+	bind ode.ocn_rd_if			{ocn_wr_channel[20]};
+
+	//ocn_22						//deparser			//ocn_12				//ocn_21
+	bind ocn_22.ocn_rd_if			{ocn_rd_channel[22], ocn_wr_channel[21], ocn_wr_channel[16]};
+	bind ocn_22.ocn_wr_if			{ocn_wr_channel[22], ocn_rd_channel[21], ocn_rd_channel[16]};
+
+	bind deparser.ocn_wr_if		{ocn_rd_channel[22]};
+	bind deparser.ocn_rd_if		{ocn_wr_channel[22]};
+
+
+	bind splitter.ingress {ingress};
+	bind deparser.egress {egress};
+
+};
+
+PE PacketGenerator("PacketGeneratorConfig.cfg") {
+	QueueWrI out;
+};
+
+PE ReorderLogger("ReorderLoggerConfig.cfg") {
+	QueueRdI in;
+	QueueWrI out;
+};
+
+PE Logger("LoggerConfig.cfg") {
+	QueueRdI in;
+	QueueWrI out;
+};
+
+PE PacketSink {
+	QueueRdI in;
+}
+
+PE top("TopConfig.cfg") {
+	Queue IKI, IKE;
+	PacketGenerator packet_generator;
+
+  Queue logger_out;
+  Queue relogger_out;
+	Logger logger;
+  //ReorderLogger relogger;
+  PacketSink sink;
+
+
+	NPU npu("NPU.cfg");
+	ControlPlane control_plane;
+
+	bind packet_generator.out {IKI};
+	bind npu.ingress {IKI};
+	bind npu.egress {IKE};
+	bind control_plane.cpa {npu};
+	bind logger.in {IKE};
+  bind logger.out {logger_out};
+  bind sink.in    {logger_out};
+};

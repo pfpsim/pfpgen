@@ -1,0 +1,18 @@
+interface_decl
+A correct interface declaration. Should compile correctly
+
+   interface foo;
+   PE top {
+
+   };
+
+%SUC
+
+interface_w_type_config
+A correct interface declaration with a type config. Should compile
+
+   interface foo("somepath.cfg");
+   PE top {
+   
+   };
+%SUC

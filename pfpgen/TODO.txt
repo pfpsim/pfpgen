@@ -1,0 +1,57 @@
+TODO
+
+- completely remove metadata
+   - Done in frontend
+- config file for arrays e.g. `Queue fooq[23]("someconfig.cfg");`
+   - Done in frontend but with opposite syntax order, e.g.
+      Queue fooq("foo.cfg")[23];
+
+- Type config vs. instance configs. Type configs are like this and are for all supertypes
+      PE foo("foo.cfg") {
+       ...
+      }
+
+      CE foo("foo.cfg") {
+
+      }
+   - Done in frontend + test-cases
+
+- NOTE if there is no type top level config , then having an instance config is an error
+      This should be an error:
+
+      PE foo {};
+
+      PE top {
+         foo x("something.cfg"); // ERROR - instance config specified for type with no type config
+      }
+
+   ^ this can and should be caught by the FAD compiler
+   - Done in frontend + test-cases
+
+- Keys that are in the instance config but not present in the type config should be a runtime (elaboration time) error.
+- Config Root should be passed as a command line arg, e.g.
+      ./pfpsim --config-path ./some/folder
+
+
+- include statement:
+
+import library_name.whatever;
+
+^ Looks for library_name/whatever.fad in the current source path
+   ^ If it's found, then it is compiled and code is generated for it
+^ If it's not found, then search for the same path in the current library path
+   ^ If it's found, then it's parsed so that its symbols are in the symbol tables but they're marked so code
+     is not generated, but it imported/linked from the library
+^ If the same name is found in both paths, give a warning
+
+
+
+--------
+
+- Caching:	
+	-Looks if dir already exists.
+		-Replace the whole simsrc dir.
+		-Generate Userfile if does not exist. 
+
+
+

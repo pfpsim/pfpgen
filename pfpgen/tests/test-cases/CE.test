@@ -1,0 +1,55 @@
+CE_decl_wout_intface
+CE declaration without interface
+
+   CE fooCE;
+   PE top{};
+
+%SYN
+
+CE_decl_w_type_conf_but_no_intf
+CE declaration with type config but no interface
+
+   CE fooCE("foo.cfg");
+   PE top{};
+
+%SYN
+
+
+CE_w_service
+CE implementing service
+
+   service foobar;
+   CE fooCE implements foobar;
+   PE top{};
+
+%SEM
+
+CE_decl
+CE declaration
+
+   interface foobar;
+   CE fooCE implements foobar;
+   PE top{};
+
+%SUC
+
+CE_decl_w_type_conf
+CE declaration with type config
+
+    interface fooi;
+    CE foo("foo.cfg") implements fooi;
+    PE top{};
+
+%SUC
+
+CE_decl_w_type_conf_and_instance_config
+CE declaration with type config and instance config
+
+    interface fooi;
+    CE foo("foo.cfg") implements fooi;
+    PE top{
+       foo f("foo-instance.cfg");
+    };
+
+%SUC
+

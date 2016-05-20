@@ -1,0 +1,39 @@
+This directory is where test cases for the fad compiler
+can be specified. This is quite simple to do, only a
+couple of rules must be followed:
+
+   - Any file with the extension `.test` will be parsed
+     for test cases.
+   - The name of the file must be a valid Python identifier
+      - Should be matched by `^[A-Za-z_][A-Za-z0-9_]*$`
+      - Must not be a reserved word or the name of a built-in
+        function of class.
+   - The syntax of the file is the following
+
+      <test case function name>
+         - one line
+         - The name that will be used for the test-case member function.
+           this will be concatenated with "test_" to form the name of a
+           member function in the test class, so it must also be a valid
+           python identifier.
+      <test case description>
+         - one line
+         - This is just a one-line description of the test case, no
+           special restrictions. It will be the docstring of the function
+      <blank line>
+      <fad program>
+         - 0 or more lines
+         - This is the FAD program which will be compiled as the test case
+         - lines are concated together and fed to the parser
+      <expected result>
+         - 1 line
+         - First character of the line must be '%'
+         - followed immediately by one of:
+            - SYN: For the test to pass, a syntax error must be generated
+            - SEM: For the test to pass, a semantic error must be generated
+            - SUC: For the test to pass, not error must be generated
+
+      <Any number of blank lines (0 or more)>
+      <repeat>
+
+   - For examples, see any `.test` file in this directory

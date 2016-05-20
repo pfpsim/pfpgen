@@ -1,0 +1,32 @@
+short_bad_decl
+A nonsense word, followed by a semicolon
+
+nonsense;
+
+%SYN
+
+EOF_bad_decl
+A nonsense word and nothing else
+
+nonsense
+
+
+%SYN
+
+bad_decl
+A nonsense declaration. This should be a syntax error.
+
+nonsense garbage;
+
+%SYN
+
+bad_decl_w_good_top
+A nonsense declaration but with a valid top module. Should fail.
+
+nonsense garbage;
+
+PE top {
+
+};
+
+%SYN

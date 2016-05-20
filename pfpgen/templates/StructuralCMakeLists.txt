@@ -1,0 +1,4 @@
+set(STRUCTURAL_SRC
+<sourcesmarker>
+PARENT_SCOPE
+)

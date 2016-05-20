@@ -1,0 +1,13 @@
+#YAML
+---
+GeneratedDirectory: #Structure of Generated Directory
+  build:
+    - CMake
+    - Configs:
+        - Configuration Directory
+  src:
+    - Base Source
+    - behavioural:
+        - User Code
+    - structural:
+        - SIM Code

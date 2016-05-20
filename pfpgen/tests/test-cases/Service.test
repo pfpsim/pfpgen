@@ -1,0 +1,19 @@
+service_decl
+A correct service declaration. Should compile
+
+service foobar;
+PE top {
+
+};
+
+%SUC
+
+service_w_type_config
+A correct service declaration with a type config. Should compile
+
+service foo("bar.cfg");
+PE top {
+
+};
+
+%SUC

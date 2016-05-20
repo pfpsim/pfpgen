@@ -1,0 +1,67 @@
+language: python
+python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+cache:
+  directories:
+    - systemc-2.3.1
+    - nanomsg-0.5-beta
+branches:
+  except:
+    - documentation
+before_install:
+  - sudo cp /etc/apt/sources.list /etc/apt/sources.list.d/trusty.list
+  - sudo sed -i 's/precise/trusty/g' /etc/apt/sources.list.d/trusty.list
+  - sudo apt-get update -qq -y
+  # P4 dependencies
+  - sudo apt-get install -q -y libpcap-dev libprotobuf-dev libstdc++-4.8-dev clang
+                               libgmp-dev
+  # Install SystemC
+  - if [ ! -f systemc-2.3.1/Makefile ]; then wget http://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.1.tgz; fi
+  - if [ ! -f systemc-2.3.1/Makefile ]; then tar -xzf systemc-2.3.1.tgz; fi
+  - cd systemc-2.3.1
+  - if [ ! -f Makefile ]; then ./configure --prefix=/usr --with-unix-layout; fi
+  - make
+  - sudo make install
+  - cd ..
+  # Install nanomsg
+  - if [ ! -f nanomsg-0.5-beta/Makefile ]; then wget http://download.nanomsg.org/nanomsg-0.5-beta.tar.gz; fi
+  - if [ ! -f nanomsg-0.5-beta/Makefile ]; then tar -xzf nanomsg-0.5-beta.tar.gz; fi
+  - cd nanomsg-0.5-beta
+  - if [ ! -f Makefile ]; then ./configure; fi
+  - make
+  - sudo make install
+  - cd ..
+  # Install PFPSim core and PFP-P4
+  - .travis/get-PFPSim.py "v1.0.0" "$CXX"
+  - sudo dpkg -i pfpsim*.deb
+install:
+  - python setup.py install
+  # Workaround, see: https://github.com/travis-ci/travis-ci/issues/1748
+  - mkdir -p $HOME/.python-eggs
+  - chmod og-w $HOME/.python-eggs
+script:
+  - ./run_test.sh
+env:
+  global:
+    - CXX=clang++
+
+
+before_deploy:
+  - python setup.py bdist_wheel --universal
+  - python setup.py sdist --formats=gztar,zip
+  - rm dist/*.egg # We're not deploying eggs!!
+deploy:
+  provider: releases
+  file_glob: true
+  file: dist/*
+  api_key:
+    secure: "mw8nvV+1fwbTLE2Pe82B2JZa3n2Gvv5zGd/wooVt8TJqEYiYxVfYPnWuQbWrJp7/1t61/+5vakdmKqeDdFbKhXOWwHwxi6I6Klu1eY6KmtjUOUALTO70dXUAbiruCYF5UdpVBRCI0eX2Stmbd+ycXbiSPWz9dGPnN/sFduWcNpnCBw53kU4CpYwKSCosW7liH1FX8dFTdBOAUG9h53WwyyaqKmr2uFgCSPKhxHgXe96zz/QpPc96D9RdB1c+yKAIaW38DCMXRS1f8Kl+yI7qQ/YWni4tuKtB6NHA/AL5VTuTJIA6NW8jluRulraqVvdcCYRsUj0gs7yqzj2b7pjUsXp+1eb6apMkAWKztWhn1Dkdp7Rg2OVIjXfqmAwbMmjuycAOxZgVWHwQTJ2LqiwoO872RvtBN3d6irpY/zBClrkA++uzhGeZdAmSQucgBa9K94CNehXJCts86g6YkjlQeddfR1RyaWDS8UXuRQIDxEbDtbJE3EnAiDCONucYswQU1+t58VX+xgwf6u7IjSQ5pUCR+J3mwEndk8TcyO9KOyNibmX4SBsYxUS/LmQ5+UTkFettptCZ7owgUj4nslDV502EPdSsVwMwBLa2UlAV3AQTosOFEuDpMh9Oo0VZitdkMK7pLNu3i5o4JgF2f7oC4v+53zwbl0goK5j4DBDU/bU="
+  skip_cleanup: true
+  on:
+    tags: true
+    # Only deploy once
+    python: "2.7"

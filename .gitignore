@@ -1,0 +1,13 @@
+*.pyc
+*.swp
+npu.json
+parser.out
+parsetab.py
+simple.fad
+fad/src/
+fad/build/
+*.cache
+docs/faddocs/_site
+docs/faddocs/Gemfile.lock
+fad/refactor/
+dist/
