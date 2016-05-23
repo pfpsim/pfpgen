@@ -51,21 +51,11 @@ decisions.
 
 ## Overview
 
-The PFPSim methodology is driven by emerging software-defined networking trends,
-such as the need to program forwarding devices with new protocols, the emergence of
-new programming paradigms such as [P4](http://p4.org) and [POF](http://www.poforwarding.org),
-and of programmable forwarding plane hardware such as NPUs and reconfigurable pipelines.
-PFPSim aims to enable early co-design of forwarding plane platforms and applications, through an intuitive
-toolchain that makes it easy to create, modify and debug simulation models.
+Software-Defined Networking (SDN) enables centralized network control by physical separating the control plane from the forwarding plane. The next logical step in SDN is the ability to fully program the forwarding behavior from the controller, i.e. a Programmable Forwarding Plane. The emergence of new forwarding plane programming languages such as P4 and POF, and highly programmable forwarding hardware such as NPUs and reconfigurable pipelines, is evidence of this growing trend. 
 
-![methodology](https://cloud.githubusercontent.com/assets/943241/15301816/b68a5886-1b7d-11e6-8062-84567ca96456.PNG)
+![methodology](https://raw.githubusercontent.com/pfpsim/pfpsim.github.io/master/images/banner-image.png)
 
-The dataplane application and target architecture model are independent of each other, but can be optimized
-based on their interaction. An example application might consist of parsing followed by the execution of a
-control-flow graph of match-action tables, and could be written in C++ or a DSL such as P4. The target architecture
-model is composed of a structural and behavioural specification. These components are combined using our model-generation
-platform to create a fast, host-compiled simulation model, which allows pre-silicon debugging, and
-co-optimization of applications and hardware architectures.
+PFPSim enables pre-silicon co-design and co-optimization of programmable forwarding plane architecture and applications as seen in the figure above. The forwarding plane designer specifies a mapping between the application (written in P4, C or C++) and the forwarding architecture (described in a simple architecture description language). A model generator (pfpgen) auto-generates a host-compiled simulation binary from the forwarding plane specification. A powerful debugger (pfpdb) enables the designer to debug their application running on a model of the target architecture. The user can also program observers to generate interesting simulation metrics such as packet latency, memory footprint, power consumption etc. to guide pre-silicon optimization of both the application and the forwarding architecture.
 
 ## Basic Workflow
 
